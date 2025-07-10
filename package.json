@@ -1,0 +1,23 @@
+{
+  "name": "decouverto-elevation",
+  "version": "1.0.0",
+  "description": "A repo to experiments way to get elevation for hikes.",
+  "main": "open_itinerary.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decouverto/decouverto-elevation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/decouverto/decouverto-elevation/issues"
+  },
+  "homepage": "https://github.com/decouverto/decouverto-elevation#readme",
+  "dependencies": {
+    "dotenv": "^17.2.0"
+  }
+}
