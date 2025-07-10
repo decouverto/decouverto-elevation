@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/decouverto/decouverto-elevation#readme",
   "dependencies": {
-    "dotenv": "^17.2.0"
+    "dotenv": "^17.2.0",
+    "puppeteer": "^24.12.1"
   }
 }

@@ -1,7 +1,6 @@
-// plot elevation data from elevation_results.json using Plotly and save as PNG
+// plot elevation data from elevation_results.json using Plotly
 
 const fs = require('fs');
-const puppeteer = require('puppeteer');
 
 // Read and parse the elevation data
 let elevationData = JSON.parse(fs.readFileSync('elevation_results_2.json', 'utf8'));
@@ -68,17 +67,16 @@ const layout = {
     },
     plot_bgcolor: 'white',
     paper_bgcolor: 'white',
-    hovermode: 'closest',
-    width: 1200,
-    height: 600
+    hovermode: 'closest'
 };
 
 const config = {
-    displayModeBar: false,
-    displaylogo: false
+    displayModeBar: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
 };
 
-// Create HTML content
+// Save the plot as HTML
 const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -89,13 +87,15 @@ const htmlContent = `
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: white;
+            background-color: #f5f5f5;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background-color: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .stats {
             display: flex;
@@ -151,55 +151,11 @@ const htmlContent = `
 </body>
 </html>`;
 
-async function generatePNG() {
-    try {
-        // Write HTML file temporarily
-        fs.writeFileSync('temp_elevation_plot.html', htmlContent);
-        
-        // Launch browser
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
-        
-        const page = await browser.newPage();
-        
-        // Set viewport for consistent sizing
-        await page.setViewport({ width: 1280, height: 800 });
-        
-        // Load the HTML file
-        await page.goto(`file://${process.cwd()}/temp_elevation_plot.html`);
-        
-        // Wait for Plotly to render by checking if the plot element exists and has content
-        await page.waitForFunction(() => {
-            const plotElement = document.getElementById('plot');
-            return plotElement && plotElement.children.length > 0;
-        }, { timeout: 10000 });
-        
-        // Additional wait to ensure rendering is complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Take screenshot
-        await page.screenshot({
-            path: 'elevation_profile.png',
-            fullPage: true,
-            type: 'png'
-        });
-        
-        await browser.close();
-        
-        // Clean up temporary HTML file
-        fs.unlinkSync('temp_elevation_plot.html');
-        
-        console.log('Elevation profile saved as elevation_profile.png');
-        console.log(`Total distance: ${cumulativeDistance.toFixed(2)} km`);
-        console.log(`Elevation range: ${Math.min(...elevations)}m - ${Math.max(...elevations)}m`);
-        console.log(`Elevation gain: ${Math.max(...elevations) - Math.min(...elevations)}m`);
-        
-    } catch (error) {
-        console.error('Error generating PNG:', error);
-    }
-}
+fs.writeFileSync('elevation_profile.html', htmlContent);
+console.log('Elevation profile saved as elevation_profile.html');
+console.log(`Total distance: ${cumulativeDistance.toFixed(2)} km`);
+console.log(`Elevation range: ${Math.min(...elevations)}m - ${Math.max(...elevations)}m`);
+console.log(`Elevation gain: ${Math.max(...elevations) - Math.min(...elevations)}m`);
 
 // Create a simple console output for quick visualization
 console.log('\nElevation Profile Summary:');
@@ -212,6 +168,3 @@ if (distances.length > 10) {
     console.log('...');
     console.log(`${distances[distances.length-1].toFixed(2).padStart(12)} | ${elevations[elevations.length-1].toString().padStart(12)}`);
 }
-
-// Generate the PNG
-generatePNG();
