@@ -34,4 +34,8 @@ node_modules/
 
 # Yarn Integrity file
 .yarn-integrity 
-elevation_results.json
+
+
+elevation_results*.json
+
+elevation_profile.*
