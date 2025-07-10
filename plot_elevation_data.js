@@ -37,20 +37,49 @@ for (let i = 1; i < elevationData.elevationData.length; i++) {
     elevations.push(curr.elevation);
 }
 
-// Create the plot data
+// Moving average smoothing function
+function movingAverage(arr, windowSize) {
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+        let start = Math.max(0, i - Math.floor(windowSize / 2));
+        let end = Math.min(arr.length, i + Math.ceil(windowSize / 2));
+        let window = arr.slice(start, end);
+        let avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+        result.push(avg);
+    }
+    return result;
+}
+
+const windowSize = 10; // You can adjust this for more/less smoothing
+const elevationsSmoothed = movingAverage(elevations, windowSize);
+
+// Create the plot data (original and smoothed)
 const trace = {
     x: distances,
     y: elevations,
     type: 'scatter',
     mode: 'lines+markers',
-    name: 'Elevation Profile',
+    name: 'Original Elevation',
     line: {
         color: '#1f77b4',
-        width: 2
+        width: 2,
+        dash: 'dot'
     },
     marker: {
         size: 4,
         color: '#1f77b4'
+    }
+};
+
+const traceSmoothed = {
+    x: distances,
+    y: elevationsSmoothed,
+    type: 'scatter',
+    mode: 'lines',
+    name: 'Smoothed Elevation',
+    line: {
+        color: '#ff7f0e',
+        width: 3
     }
 };
 
@@ -143,7 +172,7 @@ const htmlContent = `
         <div id="plot"></div>
     </div>
     <script>
-        var data = ${JSON.stringify([trace])};
+        var data = ${JSON.stringify([trace, traceSmoothed])};
         var layout = ${JSON.stringify(layout)};
         var config = ${JSON.stringify(config)};
         Plotly.newPlot('plot', data, layout, config);
