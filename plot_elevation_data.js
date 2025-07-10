@@ -6,36 +6,7 @@ const puppeteer = require('puppeteer');
 // Read and parse the elevation data
 let elevationData = JSON.parse(fs.readFileSync('elevation_results.json', 'utf8'));
 
-// Function to calculate distance between two points using Haversine formula
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distance in kilometers
-}
 
-// Calculate cumulative distances and extract elevations
-let cumulativeDistance = 0;
-let distances = [0]; // Start at 0
-let elevations = [elevationData[0].elevation];
-
-for (let i = 1; i < elevationData.length; i++) {
-    const prev = elevationData[i-1];
-    const curr = elevationData[i];
-    
-    const distance = calculateDistance(
-        prev.latitude, prev.longitude,
-        curr.latitude, curr.longitude
-    );
-    
-    cumulativeDistance += distance;
-    distances.push(cumulativeDistance);
-    elevations.push(curr.elevation);
-}
 
 // Moving average smoothing function
 function movingAverage(arr, windowSize) {
